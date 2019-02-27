@@ -17,21 +17,8 @@ class Crawler(object):
             headers = {
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                               '(KHTML, like Gecko) Chrome/72.0.3626.81 Safari/537.36',
-                'cookie': 'd_c0="AACnkZyY1Q2PTok7Ubw6wOlJZDWvBBk1Mbk=|1530452493";'
-                          '_zap=43073ef8-3c79-4869-ac38-e1b1e92a5686;_xsrf=c6MLgFIwo7uTEdeXM8N5I6inmnT7mU79;'
-                          'tst=r;q_c1=1f6c2295ca254d28a35d4b9424a3f618|1551097311000|1530452493000;'
-                          'tgw_l7_route=f2979fdd289e2265b2f12e4f4a478330;'
-                          'capsion_ticket="2|1:0|10:1551098005|14:capsion_ticket|'
-                          '44:MmQ0MzM4OWNiNTE1NDRlNjg4N2U4MmM1ZmQ3MDhjZjU=|'
-                          '7c1a57cf0baf958a705d9a673c165e4b8a8b13eb62cbdebb137b0d0ae500b6b7";'
-                          'z_c0="2|1:0|10:1551098048|4:z_c0|'
-                          '92:Mi4xTHBZaUF3QUFBQUFBQUtlUm5KalZEU2NBQUFDRUFsVk53RzJiWEFEeHZJRHhIYU5ndj'
-                          'RBVFhuR1k5TVdDb3I2eUtn|d83abaaa83d3636e8fb8b248e02413a1ead9ec8215a6eee7775c1ec8e950382e"'
+                'cookie': 'cookie' #这里填写你自己的登入的cookie
             }
-            # headers = {
-            #     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            #                   '(KHTML, like Gecko) Chrome/72.0.3626.81 Safari/537.36'
-            # }
             r = requests.get(url, headers=headers)
             # 爬取延时
             time.sleep(0.2)
@@ -126,20 +113,3 @@ class Crawler(object):
             following_html = self.get_page_html(following_url)
             new_urls.extend(self.get_new_urls(following_html))
         return userinfo, new_urls
-        # print(userinfo, new_urls)
-
-
-if __name__ == '__main__':
-    page_url = 'https://www.zhihu.com/people/zhouyuan'
-    a = Crawler()
-    # html = a.get_page_html(page_url)
-    # urls = a.get_following_urls(page_url, html)
-    # for url in urls:
-    #     print(url)
-    #     follow_json = a.get_page_html(url)
-    #     a.get_new_urls(follow_json)
-    #     break
-    # follow_json = a.get_page_html(urls[0])
-    # a.get_new_urls(follow_json)
-    # a.get_userinfo(html)
-    a.main(page_url)
