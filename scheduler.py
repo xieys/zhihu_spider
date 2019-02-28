@@ -12,12 +12,15 @@ class Scheduler(object):
 
     def main(self):
         self.db.add(MONGO_COLLECTION_URL, {'url': START_URL})
-        while self.db.count(MONGO_COLLECTION_URL) > 0 and self.db.count(MONGO_COLLECTION_USERINFO) < 6:
+        while self.db.count(MONGO_COLLECTION_URL) > 0:
             url = self.db.remove_one(MONGO_COLLECTION_URL)['url']
             userinfo, new_urls = self.crawler.main(url)
-            self.db.add(MONGO_COLLECTION_USERINFO, userinfo)
-            for new_url in new_urls:
-                self.db.add(MONGO_COLLECTION_URL, {'url': new_url})
+            if userinfo or new_urls:
+                self.db.add(MONGO_COLLECTION_USERINFO, userinfo)
+                for new_url in new_urls:
+                    self.db.add(MONGO_COLLECTION_URL, {'url': new_url})
+            else:
+                self.db.add(MONGO_COLLECTION_USERINFO, {'user_url': url, 'declare': '该账户可能已经注销'})
 
 
 if __name__ == '__main__':

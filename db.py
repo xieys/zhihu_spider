@@ -15,7 +15,7 @@ class Mongo(object):
         :param data: 数据
         :return:
         """
-        if self.find(collection, data).count() == 0:
+        if self.find(collection, data).count() == 0 and data is not None:
             self.db[collection].insert(data)
             print("保存{}到{}数据库集合成功。".format(data, collection))
 

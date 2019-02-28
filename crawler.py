@@ -20,6 +20,7 @@ class Crawler(object):
                 'cookie': 'cookie' #这里填写你自己的登入的cookie
             }
             r = requests.get(url, headers=headers)
+            print("正在获取{}的网页源码，状态码为{}".format(url, r.status_code))
             # 爬取延时
             time.sleep(0.2)
             print(r.status_code)
@@ -28,13 +29,9 @@ class Crawler(object):
                 return r.text
         return None
 
-    def get_following_urls(self, userinfo_page_url, userinfo_html):
-        if not userinfo_html:
+    def get_following_urls(self, userinfo_page_url, following_num):
+        if not following_num:
             return None
-        userinfo_html = etree.HTML(userinfo_html)
-        following_num = \
-            userinfo_html.xpath(
-                '//div[@class="NumberBoard FollowshipCard-counts NumberBoard--divider"]//strong/text()')[0]
         base_following_url = '/followees?include=data%5B*%5D.answer_count%2Carticles_count%2Cgender%2C' \
                              'follower_count%2Cis_followed%2Cis_following%2Cbadge%5B%3F(type%3Dbest_answerer)%5' \
                              'D.topics&offset={}&limit={}'
@@ -50,6 +47,8 @@ class Crawler(object):
         :param following_json:
         :return:
         """
+        if not following_json:
+            return None
         # 解析返回的json数据
         base_url = 'https://www.zhihu.com'
         user_urls = []
@@ -64,27 +63,34 @@ class Crawler(object):
         return user_urls
 
     def get_userinfo(self, userinfo_url, user_page_html):
-
         """
         获取用户的详细信息
         :param userinfo_url:
         :param user_page_html:
         :return:
         """
+        if not user_page_html:
+            return None
+        print('正在爬取{}'.format(userinfo_url))
         user_page_html = etree.HTML(user_page_html)
-        username = user_page_html.xpath('//span[@class="ProfileHeader-name"]/text()')[0]
-        following_num = \
-            user_page_html.xpath(
-                '//div[@class="NumberBoard FollowshipCard-counts NumberBoard--divider"]//strong/text()')[0]
-        followers_num = \
-            user_page_html.xpath(
-                '//div[@class="NumberBoard FollowshipCard-counts NumberBoard--divider"]//strong/text()')[1]
+        username = "".join(user_page_html.xpath('//span[@class="ProfileHeader-name"]/text()'))
+        follow_num = user_page_html.xpath(
+            '//div[@class="NumberBoard FollowshipCard-counts NumberBoard--divider"]//strong/text()')
+        if not follow_num:
+            return None
+        following_num = follow_num[0]
+        followers_num = follow_num[1]
         user_avatar_url = user_page_html.xpath('//img[@class="Avatar Avatar--large UserAvatar-inner"]/@src')[0]
         userinfo_detail_items = user_page_html.xpath('//div[@class ="ProfileHeader-infoItem"]')
         if userinfo_detail_items:
+            jobs = userinfo_detail_items[0].xpath('.//text()')
+            if len(userinfo_detail_items) > 1:
+                school = userinfo_detail_items[1].xpath('.//text()')
+            else:
+                school = []
             userinfo_detail = {
-                'jobs': userinfo_detail_items[0].xpath('.//text()'),
-                'school': userinfo_detail_items[1].xpath('.//text()')
+                'jobs': jobs,
+                'school': school
             }
         else:
             userinfo_detail = []
@@ -107,9 +113,17 @@ class Crawler(object):
         """
         new_urls = []
         user_page_html = self.get_page_html(userinfo_url)
-        userinfo = self.get_userinfo(userinfo_url, user_page_html)
-        following_urls = self.get_following_urls(userinfo_url, user_page_html)
-        for following_url in following_urls:
-            following_html = self.get_page_html(following_url)
-            new_urls.extend(self.get_new_urls(following_html))
-        return userinfo, new_urls
+        if user_page_html:
+            userinfo = self.get_userinfo(userinfo_url, user_page_html)
+            if userinfo:
+                following_urls = self.get_following_urls(userinfo_url, userinfo['following_num'])
+                for following_url in following_urls:
+                    following_html = self.get_page_html(following_url)
+                    new_urls.extend(self.get_new_urls(following_html))
+                return userinfo, new_urls
+        return None, None
+
+
+if __name__ == '__main__':
+    a = Crawler()
+    a.main('https://www.zhihu.com/people/kmxz')
