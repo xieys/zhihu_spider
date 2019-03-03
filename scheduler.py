@@ -11,6 +11,10 @@ class Scheduler(object):
         self.db = Mongo(MONGO_DB)
 
     def main(self):
+        """
+        程序主逻辑函数
+        :return:
+        """
         self.db.add(MONGO_COLLECTION_URL, {'url': START_URL})
         while self.db.count(MONGO_COLLECTION_URL) > 0:
             url = self.db.remove_one(MONGO_COLLECTION_URL)['url']

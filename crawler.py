@@ -17,7 +17,7 @@ class Crawler(object):
             headers = {
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                               '(KHTML, like Gecko) Chrome/72.0.3626.81 Safari/537.36',
-                'cookie': 'cookie' #这里填写你自己的登入的cookie
+                'cookie': 'cookie'  # 这里填写你自己的登入的cookie
             }
             r = requests.get(url, headers=headers)
             print("正在获取{}的网页源码，状态码为{}".format(url, r.status_code))
@@ -30,6 +30,12 @@ class Crawler(object):
         return None
 
     def get_following_urls(self, userinfo_page_url, following_num):
+        """
+        根据用户主页拼接关注列表的url
+        :param userinfo_page_url:
+        :param following_num:
+        :return:
+        """
         if not following_num:
             return None
         base_following_url = '/followees?include=data%5B*%5D.answer_count%2Carticles_count%2Cgender%2C' \
